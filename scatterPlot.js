@@ -1,5 +1,11 @@
  const ScatterPlot = () => { 
     let width;
+    let height;
+    let data;
+    let xValue;
+    let yValue;
+    let margin;
+    let radius;
 
     const my = () => {};
     
@@ -16,6 +22,7 @@
     }
 
     my.xValue = function (param) {
+        console.log("param", param);
         return arguments.length ? (xValue = param, my) : xValue;
     }
 
@@ -34,5 +41,5 @@
 
 }
 
-export default ScatterPlot;
+export { ScatterPlot };
     
