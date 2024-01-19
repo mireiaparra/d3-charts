@@ -51,60 +51,7 @@ const main = async () => {
 
   svg.call(plot);
 
-  const x = d3
-    .scaleLinear()
-    .domain(d3.extent(data, xValue))
-    .range([margin.left, width - margin.right]);
-
-  const y = d3
-    .scaleLinear()
-    .domain(d3.extent(data, yValue))
-    .range([height - margin.bottom, margin.top]);
-
-  const marks = data.map((d) => ({
-    x: x(xValue(d)),
-    y: y(yValue(d)),
-  }));
-
-  svg
-    .selectAll("circle")
-    .data(marks)
-    .join("circle")
-    .attr("cx", (d) => d.x)
-    .attr("cy", (d) => d.y)
-    .attr("r", 5);
-
-  svg
-    .append("g")
-    .attr("transform", `translate(0,${height - margin.bottom})`)
-    .call(d3.axisBottom(x));
-  // .call((g) => g.select(".domain").remove())
-  // .call((g) =>
-  // g
-  // .append("text")
-  // .attr("x", width - margin.right)
-  // .attr("y", -4)
-  // .attr("fill", "currentColor")
-  // .attr("font-weight", "bold")
-  // .attr("text-anchor", "end")
-  // .text(data.x)
-  // );
-
-  svg
-    .append("g")
-    .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
-  // .call((g) => g.select(".domain").remove())
-  // .call((g) =>
-  // g
-  // .append("text")
-  // .attr("x", 4)
-  // .attr("y", margin.top)
-  // .attr("fill", "currentColor")
-  // .attr("font-weight", "bold")
-  // .attr("text-anchor", "start")
-  // .text(data.y)
-  // );
+  
 
   const options = [
     { value: "Year", text: "Year" },
