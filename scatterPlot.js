@@ -6,16 +6,27 @@ const ScatterPlot = () => {
   let data;
   let xValue;
   let yValue;
+  let xType;
+  let yType;
   let margin;
   let radius;
 
   const my = (selection) => {
-    const x = d3
+    const x = 
+    xType === "string" ?
+    d3.scalePoint()
+    .domain(data.map(xValue))
+    .range([margin.left, width - margin.right])
+    : d3
     .scaleLinear()
     .domain(d3.extent(data, xValue))
     .range([margin.left, width - margin.right]);
-
-  const y = d3
+  const y = 
+  yType === "string" ?
+    d3.scalePoint()
+    .domain(data.map(yValue))
+    .range([height - margin.bottom, margin.top])
+    : d3
     .scaleLinear()
     .domain(d3.extent(data, yValue))
     .range([height - margin.bottom, margin.top]);
@@ -102,6 +113,14 @@ selection
   my.yValue = function (param) {
     return arguments.length ? ((yValue = param), my) : yValue;
   };
+
+    my.xType = function (param) {
+    return arguments.length ? ((xType = param), my) : xType;
+    }
+
+    my.yType = function (param) {
+    return arguments.length ? ((yType = param), my) : yType;
+    }
 
   my.margin = function (param) {
     return arguments.length ? ((margin = param), my) : margin;

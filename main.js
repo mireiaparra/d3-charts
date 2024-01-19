@@ -6,10 +6,10 @@ const { csv } = d3;
 
 const csvUrl = "./vgsales.csv";
 
-const width = 900;
+const width = 800;
 const height = 500;
 
-const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+const margin = { top: 20, right: 20, bottom: 20, left: 60 };
 
 const xValue = (d) => d.Year;
 const yValue = (d) => d.Global_Sales;
@@ -52,13 +52,18 @@ const main = async () => {
   svg.call(plot);
 
   
-
   const options = [
-    { value: "Year", text: "Year" },
-    { value: "Global_Sales", text: "Global Sales" },
-    { value: "EU_Sales", text: "EU Sales" },
-    { value: "Rank", text: "Rank" },
+    { value: "Year", text: "Year", type: "number" },
+    { value: "Global_Sales", text: "Global Sales" , type: "number"},
+    { value: "EU_Sales", text: "EU Sales", type: "number" },
+    { value: "Rank", text: "Rank", type: "number" },
+    { value: "Genre", text: "Genre", type: "string" },
   ];
+
+  const getType = (column) => {
+    const option = options.find((d) => d.value === column);
+    return option.type;
+  }
 
   xMenu.call(
     menu()
@@ -66,7 +71,10 @@ const main = async () => {
       .labelText("X:")
       .options(options)
       .on("change", (column) => {
-        svg.call(plot.xValue((d) => d[column]));
+        svg.call(plot
+          .xValue((d) => d[column])
+          .xType(getType(column))
+          );
       })
   );
   yMenu.call(
@@ -75,7 +83,9 @@ const main = async () => {
       .labelText("Y:")
       .options(options)
       .on("change", (column) => {
-        svg.call(plot.yValue((d) => d[column]));
+        svg.call(plot
+          .yValue((d) => d[column])
+          .yType(getType(column)));
       })
   );
 };
