@@ -4,7 +4,7 @@ import { ScatterPlot } from "./scatterPlot.js";
 import { menu } from "./menu.js";
 const { csv } = d3;
 
-const csvUrl = "./vgsales.csv";
+const csvUrl = "/scatterplot/vgsales.csv";
 
 const width = 800;
 const height = 500;
@@ -13,6 +13,12 @@ const margin = { top: 20, right: 20, bottom: 20, left: 60 };
 
 const xValue = (d) => d.Year;
 const yValue = (d) => d.Global_Sales;
+
+
+export function generateScatterPlot() {
+
+  d3.select('.menu-container').remove();
+  d3.select('.scatterplot-container').remove();
 
 const menuContainer = d3
   .select("body")
@@ -34,7 +40,8 @@ const svg = d3
   .select("#chart")
   .append("svg")
   .attr("width", width)
-  .attr("height", height);
+  .attr("height", height)
+  .attr("class", "scatterplot-container");
 
 const main = async () => {
   let data = await csv(csvUrl, parseRow);
@@ -91,3 +98,5 @@ const main = async () => {
 };
 
 main();
+
+}
