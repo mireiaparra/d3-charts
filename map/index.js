@@ -1,5 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+import { countriesCodes } from "./countriesCodes";
+
 const { csv, json } = d3;
 
 const width = 960;
@@ -13,8 +15,6 @@ export function generateMap() {
 
     const myData = new Map();
 
-    console.log("Transformando csv...");
-    let id = 0;
     data.forEach((d) => {
       const country = d["gadm.adm0"];
 
@@ -42,15 +42,15 @@ export function generateMap() {
         }
       }, 0);
 
+      let id = countriesCodes[country];
+
       const obj = {
         id: id,
         deaths1500: deaths1500,
         deaths1600: deaths1600,
       };
-      id++;
       myData.set(country, obj);
     });
-    console.log("Datos transformados");
 
     const color = d3
       .scaleSequential(
@@ -58,8 +58,6 @@ export function generateMap() {
         d3.interpolateBlues
       )
       .nice();
-
-    const path = d3.geoPath();
 
     const svg = d3
       .select("#chart")
@@ -74,61 +72,68 @@ export function generateMap() {
     // .attr("height", height)
     // .attr("class", "scatterplot-container");
     const europe = await json("map/europe.topojson");
-    console.log(europe);
+
+let projection = d3.geoMercator()
+      .translate([300, 750])
+      .scale(450);
+
+    const path = d3.geoPath()
+      .projection(projection);
+
 
     svg
       .append("path")
       .datum(topojson.mesh(europe, europe.objects.europe))
       .attr("fill", "none")
       .attr("stroke", "#ccc")
-      .attr("d", path);
+      .attr("d", path)
 
-    function transform(d, year) {
-      console.log(d, year);
-      const [x, y] = path.centroid(d);
-      return `
-        translate(${x},${y})
-        scale(${Math.sqrt(data.get(d.id)[year])})
-        translate(${-x},${-y})
-      `;
-    }
+
+    // function transform(d) {
+    //   console.log(myData.get(d.properties.NAME));
+    //   const [x, y] = path.centroid(d);
+    //   return `
+    //   translate(${x},${y})
+    //   scale(${Math.sqrt(myData.get(d.properties.NAME)["deaths1500"])})
+    //     translate(${-x},${-y})
+    //   `;
+    // }
 
     // Append a path for each country
-    const country = svg
-      .append("g")
-      .attr("stroke", "#000")
-      .selectAll("path")
-      .data(
-        topojson
-          .feature(europe, europe.objects.europe)
-          .features.filter((d) => 
-          console.log(d),
-          // myData.has(d.id))
-      ))
-      .join("path")
-      .attr("vector-effect", "non-scaling-stroke")
-      .attr("d", path)
-      .attr("fill", (d) => color(data.get(d.id)[0]))
-      .attr("transform", (d) => transform(d, 0));
+    // svg
+    //   .append("g")
+    //   .attr("stroke", "#000")
+    //   .selectAll("path")
+    //   .data(
+    //     topojson
+    //       .feature(europe, europe.objects.europe)
+    //       .features.filter((d) => 
+    //       myData.has(d.properties.NAME))
+    //   )
+    //   .join("path")
+    //   // .attr("vector-effect", "non-scaling-stroke")
+    //   .attr("d", d3.geoPath())
+    //   // .attr("fill", (d) => color(myData.get(d.id)[0]))
+    //   .attr("transform", (d) => transform(d, 0));
 
     // Append tooltips.
-    const format = d3.format(".1%");
-    country.append("title").text(
-      (d) => `${d.properties.name}
-${format(data.get(d.id)[0])} in 2008
-${format(data.get(d.id)[1])} in 2018`
-    );
+//     const format = d3.format(".1%");
+//     country.append("title").text(
+//       (d) => `${d.properties.name}
+// ${format(data.get(d.id)[0])} in 2008
+// ${format(data.get(d.id)[1])} in 2018`
+//     );
 
-    return Object.assign(svg.node(), {
-      update(year) {
-        country
-          .transition()
-          .duration(750)
-          .attr("fill", (d) => color(data.get(d.id)[year]))
-          .attr("transform", (d) => transform(d, year));
-      },
-      scales: { color },
-    });
+    // return Object.assign(svg.node(), {
+    //   update(year) {
+    //     country
+    //       .transition()
+    //       .duration(750)
+    //       .attr("fill", (d) => color(data.get(d.id)[year]))
+    //       .attr("transform", (d) => transform(d, year));
+    //   },
+    //   scales: { color },
+    // });
   };
   main();
 }
