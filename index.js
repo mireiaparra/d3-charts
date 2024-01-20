@@ -1,9 +1,10 @@
 import { generateScatterPlot } from './scatterplot/index';
+import { generateMap } from './map';
 
 // Definir las funciones que se ejecutarán para cada ruta
 const routes = {
     '/': generateScatterPlot,
-    // '/map': showMap,
+    '/map': generateMap,
 };
 
 // Escuchar el evento hashchange en la ventana
