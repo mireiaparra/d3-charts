@@ -8,7 +8,9 @@ const height = window.innerHeight * 0.7;
 
 const csvUrl = "/map/trials.csv";
 const myData = new Map();
-let coods1500 = [];
+
+let currentZoom = 1;
+let updateFunction = () => {};
 
 export function generateMap() {
   d3.select(".menu-container").remove();
@@ -39,6 +41,10 @@ export function generateMap() {
   const g = svg.append("g").attr("class", "container");
 
   function zoomed(event) {
+    if (event.transform.k !== currentZoom) {
+      currentZoom = event.transform.k ;
+      updateFunction({});
+    }
     const {transform} = event;
     g.attr("transform", transform);
   }
@@ -120,14 +126,15 @@ export function generateMap() {
 
     const updateData = ({ century = defaultCentury, type = defaultType }) => {
       let allCoordinates = dataCenturies[century].details
-        .filter((d) => !isNaN(Number(d[type])))
+        .filter((d) => !isNaN(Number(d[type])) && d[type] !== 0)
         .map((d) => ({
           lon: +d.lon,
           lat: +d.lat,
         }));
-
-      svg.call(plot.dataMarks(allCoordinates));
+      svg.call(plot.radius(5/currentZoom).dataMarks(allCoordinates));
     };
+
+    updateFunction = updateData;
 
     radioMenu.call(
       menuMap()
