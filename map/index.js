@@ -4,53 +4,73 @@ import { countriesCodes } from "./countriesCodes";
 
 const { csv, json } = d3;
 
-const width = 960;
-const height = 500;
+const width = window.innerWidth;
+const height = window.innerHeight * 0.7;
 
 const csvUrl = "/map/trials.csv";
+const myData = new Map();
+let coods1500 = [];
 
 export function generateMap() {
   const main = async () => {
     const data = await csv(csvUrl);
+    const dataWithCoords = data.filter(
+      (d) =>
+        !isNaN(Number(d.deaths)) && +d.deaths !== 0 &&
+        !isNaN(Number(d.lon)) &&
+        !isNaN(Number(d.lat)) &&
+        +d.lon >= -90 &&
+        +d.lon <= 90 &&
+        +d.lat >= -180 &&
+        +d.lat <= 180
+    );
+    let data1500 = dataWithCoords.filter((d) => d.century === "1400");
 
-    const myData = new Map();
+    let deathsDetails1500 = data1500.reduce(
+      (acc, curr) => {
+          acc.totalDeaths += +curr.deaths;
+          acc.details.push({
+            lon: +curr.lon,
+            lat: +curr.lat,
+            deaths: +curr.deaths,
+          });
+        return acc;
+      },
+      { totalDeaths: 0, details: [] }
+    );
 
-    data.forEach((d) => {
-      const country = d["gadm.adm0"];
+    let data1600 = dataWithCoords.filter(
+      (d) => d.century === "1600"
+    );
 
-      // filtrar para encontrar los datos de cada país
-      let data1500 = data.filter(
-        (d) => d["gadm.adm0"] === country && d.century === "1500"
-      );
-      // filtrar los datos para obtener los que tengan un valor numérico en deaths
-      const deaths1500 = data1500.reduce((acc, curr) => {
-        if (curr.deaths !== "NA") {
-          return acc + +curr.deaths;
-        } else {
-          return acc;
-        }
-      }, 0);
+    let deathsDetails1600 = data1600.reduce(
+      (acc, curr) => {
+          acc.totalDeaths += +curr.deaths;
+          acc.details.push({
+            lon: curr.lon,
+            lat: curr.lat,
+            deaths: curr.deaths,
+          });
+        return acc;
+      },
+      { totalDeaths: 0, details: [] }
+    );
 
-      let data1600 = data.filter(
-        (d) => d["gadm.adm0"] === country && d.century === "1600"
-      );
-      const deaths1600 = data1600.reduce((acc, curr) => {
-        if (curr.deaths !== "NA") {
-          return acc + +curr.deaths;
-        } else {
-          return acc;
-        }
-      }, 0);
 
-      let id = countriesCodes[country];
+    const obj = {
+      deaths1500: deathsDetails1500,
+      deaths1600: deathsDetails1600,
+    };
 
-      const obj = {
-        id: id,
-        deaths1500: deaths1500,
-        deaths1600: deaths1600,
-      };
-      myData.set(country, obj);
-    });
+    let allCoordinates = deathsDetails1500.details.map((d) => ({
+      lon: +d.lon,
+      lat: +d.lat,
+    }));
+    // .concat(
+    //   deathsDetails1600.details.map((d) => ({ lon: d.lon, lat: d.lat }))
+    // );
+    // myData.set(country, obj);
+    coods1500 = allCoordinates;
 
     const color = d3
       .scaleSequential(
@@ -68,26 +88,38 @@ export function generateMap() {
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("style", "max-width: 100%; height: auto;");
-    // .attr("width", width)
-    // .attr("height", height)
     // .attr("class", "scatterplot-container");
     const europe = await json("map/europe.topojson");
 
-let projection = d3.geoMercator()
-      .translate([300, 750])
-      .scale(450);
+    let projection = d3.geoMercator().translate([300, 900]).scale(600);
 
-    const path = d3.geoPath()
-      .projection(projection);
-
+    const path = d3.geoPath().projection(projection);
 
     svg
       .append("path")
       .datum(topojson.mesh(europe, europe.objects.europe))
       .attr("fill", "none")
       .attr("stroke", "#ccc")
-      .attr("d", path)
+      .attr("d", path);
 
+    svg
+      .append("g")
+      .selectAll("circle")
+      .data(coods1500)
+      .enter()
+      .append("circle")
+      // .attr(
+      //   "transform",
+      //   ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`
+      // )
+      .attr("cx", function (d) {
+        return projection([d.lon, d.lat])[0];
+      })
+      .attr("cy", function (d) {
+        return projection([d.lon, d.lat])[1];
+      })
+      .attr("r", 3)
+      .style("fill", "red");
 
     // function transform(d) {
     //   console.log(myData.get(d.properties.NAME));
@@ -107,7 +139,7 @@ let projection = d3.geoMercator()
     //   .data(
     //     topojson
     //       .feature(europe, europe.objects.europe)
-    //       .features.filter((d) => 
+    //       .features.filter((d) =>
     //       myData.has(d.properties.NAME))
     //   )
     //   .join("path")
@@ -117,12 +149,12 @@ let projection = d3.geoMercator()
     //   .attr("transform", (d) => transform(d, 0));
 
     // Append tooltips.
-//     const format = d3.format(".1%");
-//     country.append("title").text(
-//       (d) => `${d.properties.name}
-// ${format(data.get(d.id)[0])} in 2008
-// ${format(data.get(d.id)[1])} in 2018`
-//     );
+    //     const format = d3.format(".1%");
+    //     country.append("title").text(
+    //       (d) => `${d.properties.name}
+    // ${format(data.get(d.id)[0])} in 2008
+    // ${format(data.get(d.id)[1])} in 2018`
+    //     );
 
     // return Object.assign(svg.node(), {
     //   update(year) {
