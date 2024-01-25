@@ -18,7 +18,7 @@ const yValue = (d) => d.Global_Sales;
 export function generateScatterPlot() {
 
   d3.select('.menu-container').remove();
-  d3.select('.scatterplot-container').remove();
+  d3.select('.graphic-container').remove();
 
 const menuContainer = d3
   .select("body")
@@ -41,7 +41,7 @@ const svg = d3
   .append("svg")
   .attr("width", width)
   .attr("height", height)
-  .attr("class", "scatterplot-container");
+  .attr("class", "graphic-container");
 
 const main = async () => {
   let data = await csv(csvUrl, parseRow);

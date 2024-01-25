@@ -12,86 +12,83 @@ const ScatterPlot = () => {
   let radius;
 
   const my = (selection) => {
-    const x = 
-    xType === "string" ?
-    d3.scalePoint()
-    .domain(data.map(xValue))
-    .range([margin.left, width - margin.right])
-    : d3
-    .scaleLinear()
-    .domain(d3.extent(data, xValue))
-    .range([margin.left, width - margin.right]);
-  const y = 
-  yType === "string" ?
-    d3.scalePoint()
-    .domain(data.map(yValue))
-    .range([height - margin.bottom, margin.top])
-    : d3
-    .scaleLinear()
-    .domain(d3.extent(data, yValue))
-    .range([height - margin.bottom, margin.top]);
+    const x =
+      xType === "string"
+        ? d3
+            .scalePoint()
+            .domain(data.map(xValue))
+            .range([margin.left, width - margin.right])
+        : d3
+            .scaleLinear()
+            .domain(d3.extent(data, xValue))
+            .range([margin.left, width - margin.right]);
+    const y =
+      yType === "string"
+        ? d3
+            .scalePoint()
+            .domain(data.map(yValue))
+            .range([height - margin.bottom, margin.top])
+        : d3
+            .scaleLinear()
+            .domain(d3.extent(data, yValue))
+            .range([height - margin.bottom, margin.top]);
 
-  const marks = data.map((d) => ({
-    x: x(xValue(d)),
-    y: y(yValue(d)),
-  }));
+    const marks = data.map((d) => ({
+      x: x(xValue(d)),
+      y: y(yValue(d)),
+    }));
 
-  const t = d3.transition().duration(1000);
+    const t = d3.transition().duration(1000);
 
-  const positionCircles = (circles) => {
-    circles.attr('cx', (d) => d.x).attr('cy', (d) => d.y);
-  };
+    const positionCircles = (circles) => {
+      circles.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+    };
 
-  const initializeRadius = (circles) => {
-    circles.attr('r', 0);
-  };
-  
-  const growRadius = (enter) => {
-    enter.transition(t).attr('r', radius);
-  };
+    const initializeRadius = (circles) => {
+      circles.attr("r", 0);
+    };
 
-  const circles = selection
-  .selectAll('circle')
-  .data(marks)
-  .join(
-    (enter) =>
-      enter
-        .append('circle')
-        .call(positionCircles)
-        .call(initializeRadius)
-        .call(growRadius),
-    (update) =>
-      update.call((update) =>
-        update
-          .transition(t)
-          .delay((d, i) => i * 1)
-          .call(positionCircles)
-      ),
-    (exit) => exit.remove()
-  );
+    const growRadius = (enter) => {
+      enter.transition(t).attr("r", radius);
+    };
 
-  selection
-  .selectAll('.y-axis')
-  .data([null])
-  .join('g')
-  .attr('class', 'y-axis')
-  .attr('transform', `translate(${margin.left},0)`)
-  .transition(t)
-  .call(d3.axisLeft(y));
+    selection
+      .selectAll("circle")
+      .data(marks)
+      .join(
+        (enter) =>
+          enter
+            .append("circle")
+            .call(positionCircles)
+            .call(initializeRadius)
+            .call(growRadius),
+        (update) =>
+          update.call((update) =>
+            update
+              .transition(t)
+              .delay((d, i) => i * 1)
+              .call(positionCircles)
+          ),
+        (exit) => exit.remove()
+      );
 
-selection
-  .selectAll('.x-axis')
-  .data([null])
-  .join('g')
-  .attr('class', 'x-axis')
-  .attr(
-    'transform',
-    `translate(0,${height - margin.bottom})`
-  )
-  .transition(t)
-  .call(d3.axisBottom(x));
+    selection
+      .selectAll(".y-axis")
+      .data([null])
+      .join("g")
+      .attr("class", "y-axis")
+      .attr("transform", `translate(${margin.left},0)`)
+      .transition(t)
+      .call(d3.axisLeft(y));
 
-
+    selection
+      .selectAll(".x-axis")
+      .data([null])
+      .join("g")
+      .attr("class", "x-axis")
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .transition(t)
+      .call(d3.axisBottom(x));
   };
 
   my.width = function (param) {
@@ -114,13 +111,13 @@ selection
     return arguments.length ? ((yValue = param), my) : yValue;
   };
 
-    my.xType = function (param) {
+  my.xType = function (param) {
     return arguments.length ? ((xType = param), my) : xType;
-    }
+  };
 
-    my.yType = function (param) {
+  my.yType = function (param) {
     return arguments.length ? ((yType = param), my) : yType;
-    }
+  };
 
   my.margin = function (param) {
     return arguments.length ? ((margin = param), my) : margin;
@@ -131,7 +128,6 @@ selection
   };
 
   return my;
-  
 };
 
 export { ScatterPlot };

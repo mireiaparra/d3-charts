@@ -1,8 +1,7 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-
-import { countriesCodes } from "./countriesCodes";
-
 const { csv, json } = d3;
+import { menuMap } from "./menu.js";
+import { MapGraphic } from "./map.js";
 
 const width = window.innerWidth;
 const height = window.innerHeight * 0.7;
@@ -12,11 +11,34 @@ const myData = new Map();
 let coods1500 = [];
 
 export function generateMap() {
+  d3.select(".menu-container").remove();
+  d3.select(".graphic-container").remove();
+
+  const menuContainer = d3
+    .select("body")
+    .append("div")
+    .attr("class", "menu-container");
+
+  const radioMenu = menuContainer.append("div");
+  const selectMenu = menuContainer.append("div");
+
+  const svg = d3
+    .select("#chart")
+    .append("svg")
+    .attr("viewBox", [0, 0, width, height])
+    .attr("width", width)
+    .attr("height", height)
+    .attr("class", "graphic-container")
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round")
+    .attr("style", "max-width: 100%; height: auto;");
+
   const main = async () => {
     const data = await csv(csvUrl);
     const dataWithCoords = data.filter(
       (d) =>
-        !isNaN(Number(d.deaths)) && +d.deaths !== 0 &&
+        ((!isNaN(Number(d.deaths)) && +d.deaths !== 0) ||
+          (!isNaN(Number(d.tried)) && +d.tried !== 0)) &&
         !isNaN(Number(d.lon)) &&
         !isNaN(Number(d.lat)) &&
         +d.lon >= -90 &&
@@ -24,53 +46,39 @@ export function generateMap() {
         +d.lat >= -180 &&
         +d.lat <= 180
     );
-    let data1500 = dataWithCoords.filter((d) => d.century === "1400");
+    let defaultCentury = "1400";
+    let defaultType = "deaths";
+    let centuriesToSearch = ["1400", "1500", "1600", "1700", "1800", "1900"];
+    let dataCenturies = {};
 
-    let deathsDetails1500 = data1500.reduce(
-      (acc, curr) => {
+    centuriesToSearch.forEach((century) => {
+      let dataCentury = dataWithCoords.filter((d) => d.century === century);
+      if (dataCentury.length === 0) {
+        centuriesToSearch = centuriesToSearch.filter((c) => c !== century);
+        return;
+      }
+      let trialsDetails = dataCentury.reduce(
+        (acc, curr) => {
           acc.totalDeaths += +curr.deaths;
+          acc.totalTried += +curr.tried;
           acc.details.push({
             lon: +curr.lon,
             lat: +curr.lat,
             deaths: +curr.deaths,
+            tried: +curr.tried,
           });
-        return acc;
-      },
-      { totalDeaths: 0, details: [] }
-    );
+          return acc;
+        },
+        { totalDeaths: 0, totalTried: 0, details: [] }
+      );
 
-    let data1600 = dataWithCoords.filter(
-      (d) => d.century === "1600"
-    );
+      dataCenturies[century] = trialsDetails;
+    });
 
-    let deathsDetails1600 = data1600.reduce(
-      (acc, curr) => {
-          acc.totalDeaths += +curr.deaths;
-          acc.details.push({
-            lon: curr.lon,
-            lat: curr.lat,
-            deaths: curr.deaths,
-          });
-        return acc;
-      },
-      { totalDeaths: 0, details: [] }
-    );
-
-
-    const obj = {
-      deaths1500: deathsDetails1500,
-      deaths1600: deathsDetails1600,
-    };
-
-    let allCoordinates = deathsDetails1500.details.map((d) => ({
+    let allCoordinates = dataCenturies[defaultCentury].details.map((d) => ({
       lon: +d.lon,
       lat: +d.lat,
     }));
-    // .concat(
-    //   deathsDetails1600.details.map((d) => ({ lon: d.lon, lat: d.lat }))
-    // );
-    // myData.set(country, obj);
-    coods1500 = allCoordinates;
 
     const color = d3
       .scaleSequential(
@@ -79,74 +87,55 @@ export function generateMap() {
       )
       .nice();
 
-    const svg = d3
-      .select("#chart")
-      .append("svg")
-      .attr("viewBox", [0, 0, width, height])
-      .attr("width", width)
-      .attr("height", height)
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("style", "max-width: 100%; height: auto;");
-    // .attr("class", "scatterplot-container");
     const europe = await json("map/europe.topojson");
 
-    let projection = d3.geoMercator().translate([300, 900]).scale(600);
+    const plot = MapGraphic()
+      .translation([300, 900])
+      .scale(600)
+      .dataMap(europe)
+      .dataMapDetails(europe.objects.europe)
+      .dataMarks(allCoordinates)
+      .radius(5);
 
-    const path = d3.geoPath().projection(projection);
+    svg.call(plot);
 
-    svg
-      .append("path")
-      .datum(topojson.mesh(europe, europe.objects.europe))
-      .attr("fill", "none")
-      .attr("stroke", "#ccc")
-      .attr("d", path);
+    const updateData = ({ century = defaultCentury, type = defaultType }) => {
+      let allCoordinates = dataCenturies[century].details
+        .filter((d) => !isNaN(Number(d[type])))
+        .map((d) => ({
+          lon: +d.lon,
+          lat: +d.lat,
+        }));
 
-    svg
-      .append("g")
-      .selectAll("circle")
-      .data(coods1500)
-      .enter()
-      .append("circle")
-      // .attr(
-      //   "transform",
-      //   ({ lon, lat }) => `translate(${projection([lon, lat]).join(",")})`
-      // )
-      .attr("cx", function (d) {
-        return projection([d.lon, d.lat])[0];
-      })
-      .attr("cy", function (d) {
-        return projection([d.lon, d.lat])[1];
-      })
-      .attr("r", 3)
-      .style("fill", "red");
+      svg.call(plot.dataMarks(allCoordinates));
+    };
 
-    // function transform(d) {
-    //   console.log(myData.get(d.properties.NAME));
-    //   const [x, y] = path.centroid(d);
-    //   return `
-    //   translate(${x},${y})
-    //   scale(${Math.sqrt(myData.get(d.properties.NAME)["deaths1500"])})
-    //     translate(${-x},${-y})
-    //   `;
-    // }
+    radioMenu.call(
+      menuMap()
+        .id("century-menu")
+        .labelText("Century")
+        .menuType("radio")
+        .options(centuriesToSearch.map((c) => ({ value: c, text: c })))
+        .on("change", (value) => {
+          defaultCentury = value;
+          updateData({ century: value });
+        })
+    );
 
-    // Append a path for each country
-    // svg
-    //   .append("g")
-    //   .attr("stroke", "#000")
-    //   .selectAll("path")
-    //   .data(
-    //     topojson
-    //       .feature(europe, europe.objects.europe)
-    //       .features.filter((d) =>
-    //       myData.has(d.properties.NAME))
-    //   )
-    //   .join("path")
-    //   // .attr("vector-effect", "non-scaling-stroke")
-    //   .attr("d", d3.geoPath())
-    //   // .attr("fill", (d) => color(myData.get(d.id)[0]))
-    //   .attr("transform", (d) => transform(d, 0));
+    selectMenu.call(
+      menuMap()
+        .id("color-menu")
+        .labelText("Data")
+        .menuType("select")
+        .options([
+          { value: "deaths", text: "Deaths" },
+          { value: "tried", text: "Tried" },
+        ])
+        .on("change", (value) => {
+          defaultType = value;
+          updateData({ type: value });
+        })
+    );
 
     // Append tooltips.
     //     const format = d3.format(".1%");
