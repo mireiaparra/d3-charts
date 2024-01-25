@@ -37,8 +37,19 @@ export function generateMap() {
     .call(zoom);
 
   const g = svg.append("g").attr("class", "container");
+
   function zoomed(event) {
-    g.attr("transform", event.transform);
+    const {transform} = event;
+    g.attr("transform", transform);
+  }
+  
+  svg.call(d3.drag().filter((e) => !e.button).on("drag", dragged));
+  
+  function dragged(event) {
+    const currentTransform = d3.zoomTransform(svg.node());
+    const newX = currentTransform.x + event.dx;
+    const newY = currentTransform.y + event.dy;
+    svg.call(zoom.transform, d3.zoomIdentity.translate(newX, newY).scale(currentTransform.k));
   }
 
   const main = async () => {
