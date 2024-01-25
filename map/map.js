@@ -16,16 +16,19 @@ export const MapGraphic = () => {
     selection.select("path").remove();
 
     selection
+      .selectAll("g.container")
       .append("path")
       .datum(topojson.mesh(dataMap, dataMapDetails))
       .attr("fill", "none")
       .attr("stroke", "#ccc")
       .attr("d", path);
 
-    selection.select("g").remove();
+    selection.select("g.circle").remove();
 
     selection
+      .selectAll("g.container")
       .append("g")
+      .attr("class", "circle")
       .selectAll("circle")
       .data(dataMarks)
       .enter()
@@ -53,7 +56,6 @@ export const MapGraphic = () => {
   };
 
   my.dataMarks = function (value) {
-    console.log;
     return arguments.length ? ((dataMarks = value), my) : dataMarks;
   };
 

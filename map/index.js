@@ -22,6 +22,8 @@ export function generateMap() {
   const radioMenu = menuContainer.append("div");
   const selectMenu = menuContainer.append("div");
 
+  const zoom = d3.zoom().scaleExtent([1, 8]).on("zoom", zoomed);
+
   const svg = d3
     .select("#chart")
     .append("svg")
@@ -31,7 +33,13 @@ export function generateMap() {
     .attr("class", "graphic-container")
     .attr("stroke-linejoin", "round")
     .attr("stroke-linecap", "round")
-    .attr("style", "max-width: 100%; height: auto;");
+    .attr("style", "max-width: 100%; height: auto;")
+    .call(zoom);
+
+  const g = svg.append("g").attr("class", "container");
+  function zoomed(event) {
+    g.attr("transform", event.transform);
+  }
 
   const main = async () => {
     const data = await csv(csvUrl);
@@ -90,8 +98,8 @@ export function generateMap() {
     const europe = await json("map/europe.topojson");
 
     const plot = MapGraphic()
-      .translation([300, 900])
-      .scale(600)
+      .translation([400, 1100])
+      .scale(700)
       .dataMap(europe)
       .dataMapDetails(europe.objects.europe)
       .dataMarks(allCoordinates)
@@ -136,25 +144,6 @@ export function generateMap() {
           updateData({ type: value });
         })
     );
-
-    // Append tooltips.
-    //     const format = d3.format(".1%");
-    //     country.append("title").text(
-    //       (d) => `${d.properties.name}
-    // ${format(data.get(d.id)[0])} in 2008
-    // ${format(data.get(d.id)[1])} in 2018`
-    //     );
-
-    // return Object.assign(svg.node(), {
-    //   update(year) {
-    //     country
-    //       .transition()
-    //       .duration(750)
-    //       .attr("fill", (d) => color(data.get(d.id)[year]))
-    //       .attr("transform", (d) => transform(d, year));
-    //   },
-    //   scales: { color },
-    // });
   };
   main();
 }
