@@ -8,7 +8,6 @@ const width = window.innerWidth;
 const height = window.innerHeight * 0.7;
 
 const csvUrl = "/map/trials.csv";
-const myData = new Map();
 
 let currentZoom = 1;
 let updateFunction = () => {};
@@ -94,15 +93,27 @@ export function generateMap() {
       }
       dataCenturies[century] = dataCentury.reduce(
         (acc, curr) => {
-          acc.totalDeaths += +curr.deaths;
-          acc.totalTried += +curr.tried;
-          acc.details.push({
-            lon: +curr.lon,
-            lat: +curr.lat,
-            deaths: +curr.deaths,
-            tried: +curr.tried,
-            city: curr.city,
-          });
+          acc.totalDeaths += + isNaN(curr.deaths) ? 0 : +curr.deaths;
+          acc.totalTried += + isNaN(curr.tried) ? 0 : +curr.tried;
+
+          const detailIndex = acc.details.findIndex(
+            (d) => d.city === curr.city
+          )
+
+          if (detailIndex > -1) {
+            const detail = acc.details[detailIndex];
+            detail.deaths += + isNaN(curr.deaths) ? 0 : +curr.deaths;
+            detail.tried += + isNaN(curr.tried) ? 0 : +curr.tried  ;
+            acc.details[detailIndex] = detail;
+          } else {
+            acc.details.push({
+              lon: +curr.lon,
+              lat: +curr.lat,
+              deaths: + isNaN(curr.deaths) ? 0 : +curr.deaths,
+              tried: + isNaN(curr.tried) ? 0 : +curr.tried,
+              city: curr.city,
+            });
+          }           
           return acc;
         },
         { totalDeaths: 0, totalTried: 0, details: [] }
@@ -111,15 +122,7 @@ export function generateMap() {
     });
 
     let allCoordinates = dataCenturies[defaultCentury].details
-    .filter((d) => !isNaN(Number(d['deaths'])) && d['deaths'] !== 0)
-
-    const color = d3
-      .scaleSequential(
-        d3.extent(Array.from(myData.values())),
-        d3.interpolateBlues
-      )
-      .nice();
-
+    .filter((d) => !isNaN(Number(d[defaultType])) && d[defaultType] !== 0)
     const europe = await json("map/europe.topojson");
 
     const plot = MapGraphic()
@@ -129,13 +132,18 @@ export function generateMap() {
       .dataMapDetails(europe.objects.europe)
       .dataMarks(allCoordinates)
       .radius(5)
-      .tooltipText('city');
+      .tooltipTexts(['city', defaultType])
+      .propertyColor(defaultType);
       svg.call(plot);
-
     const updateData = ({ century = defaultCentury, type = defaultType }) => {
       let allCoordinates = dataCenturies[century].details
         .filter((d) => !isNaN(Number(d[type])) && d[type] !== 0)
-      svg.call(plot.radius(5/currentZoom).dataMarks(allCoordinates));
+      svg.call(
+        plot.radius(5/currentZoom)
+        .dataMarks(allCoordinates)
+        .propertyColor(type)
+        .tooltipTexts(['city', type])
+        );
     };
 
     updateFunction = updateData;

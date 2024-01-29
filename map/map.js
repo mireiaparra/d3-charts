@@ -7,12 +7,21 @@ export const MapGraphic = () => {
   let translation;
   let scale;
   let radius;
-  let tooltipText;
+  let tooltipTexts;
+  let propertyColor;
+
+  function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  }
 
   const my = (selection) => {
     let projection = d3.geoMercator().translate(translation).scale(scale);
 
     const path = d3.geoPath().projection(projection);
+
+const colorScale = d3.scaleLog()
+  .domain([1, d3.max(dataMarks, d => d[propertyColor])]) 
+  .interpolate(() => d3.interpolateRdPu);
 
     selection.select("path").remove();
 
@@ -24,14 +33,14 @@ export const MapGraphic = () => {
       .attr("stroke", "#ccc")
       .attr("d", path);
 
+      
+      d3.select("body > div.tooltip").remove();
+      
+      const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+      
     selection.select("g.circle").remove();
-
-    d3.selectAll("body > div.tooltip").remove();
-
-    const tooltip = d3.select("body").append("div")
-     .attr("class", "tooltip")
-     .style("opacity", 0);
-
     selection
       .selectAll("g.container")
       .append("g")
@@ -47,12 +56,12 @@ export const MapGraphic = () => {
         return projection([d.lon, d.lat])[1];
       })
       .attr("r", radius)
-      .style("fill", "red")
+      .style("fill", d => colorScale(d[propertyColor]))
       .on("mouseover", function (event, d) {
         tooltip.transition()
           .duration(200)
           .style("opacity", .9);
-          tooltip.html(d[tooltipText])
+          tooltip.html(tooltipTexts.map(key => `${capitalizeFirstLetter(key)}: ${d[key]}`).join("\n"))
           .style("position", "absolute")
           .style("left", (event.pageX) + "px")
           .style("top", (event.pageY - 28) + "px");
@@ -98,9 +107,15 @@ export const MapGraphic = () => {
     return my;
   };
 
-  my.tooltipText = function (value) {
-    if (!arguments.length) return tooltipText;
-    tooltipText = value;
+  my.tooltipTexts = function (value) {
+    if (!arguments.length) return tooltipTexts;
+    tooltipTexts = value;
+    return my;
+  }
+
+  my.propertyColor = function (value) {
+    if (!arguments.length) return propertyColor;
+    propertyColor = value;
     return my;
   }
 
