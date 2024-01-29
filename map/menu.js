@@ -47,6 +47,7 @@ export const menuMap = () => {
         .attr("id", (d) => d.value)
         .attr("name", id)
         .attr("value", (d) => d.value)
+        .property("checked", (d, i) => i === 0) 
         .on("change", (event) => {
           listeners.call("change", null, event.target.value);
         });

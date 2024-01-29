@@ -1,0 +1,6 @@
+.tooltip {
+  position: absolute;
+  background-color: aquamarine;
+  border-radius: 4px;
+  color: black;
+}

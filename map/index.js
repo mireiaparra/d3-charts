@@ -1,4 +1,5 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+import "./style.css";
 const { csv, json } = d3;
 import { menuMap } from "./menu.js";
 import { MapGraphic } from "./map.js";
@@ -58,6 +59,15 @@ export function generateMap() {
     svg.call(zoom.transform, d3.zoomIdentity.translate(newX, newY).scale(currentTransform.k));
   }
 
+  d3.select("button.reset-button").remove();
+  d3.select("#chart")
+  .append("button")
+  .attr("class", "reset-button")
+  .text("Reset position")
+  .on("click", () => {
+    svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity);
+  });
+
   const main = async () => {
     const data = await csv(csvUrl);
     const dataWithCoords = data.filter(
@@ -82,7 +92,7 @@ export function generateMap() {
         centuriesToSearch = centuriesToSearch.filter((c) => c !== century);
         return;
       }
-      let trialsDetails = dataCentury.reduce(
+      dataCenturies[century] = dataCentury.reduce(
         (acc, curr) => {
           acc.totalDeaths += +curr.deaths;
           acc.totalTried += +curr.tried;
@@ -91,19 +101,17 @@ export function generateMap() {
             lat: +curr.lat,
             deaths: +curr.deaths,
             tried: +curr.tried,
+            city: curr.city,
           });
           return acc;
         },
         { totalDeaths: 0, totalTried: 0, details: [] }
       );
 
-      dataCenturies[century] = trialsDetails;
     });
 
-    let allCoordinates = dataCenturies[defaultCentury].details.map((d) => ({
-      lon: +d.lon,
-      lat: +d.lat,
-    }));
+    let allCoordinates = dataCenturies[defaultCentury].details
+    .filter((d) => !isNaN(Number(d['deaths'])) && d['deaths'] !== 0)
 
     const color = d3
       .scaleSequential(
@@ -120,17 +128,13 @@ export function generateMap() {
       .dataMap(europe)
       .dataMapDetails(europe.objects.europe)
       .dataMarks(allCoordinates)
-      .radius(5);
-
-    svg.call(plot);
+      .radius(5)
+      .tooltipText('city');
+      svg.call(plot);
 
     const updateData = ({ century = defaultCentury, type = defaultType }) => {
       let allCoordinates = dataCenturies[century].details
         .filter((d) => !isNaN(Number(d[type])) && d[type] !== 0)
-        .map((d) => ({
-          lon: +d.lon,
-          lat: +d.lat,
-        }));
       svg.call(plot.radius(5/currentZoom).dataMarks(allCoordinates));
     };
 

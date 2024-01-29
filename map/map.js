@@ -7,6 +7,7 @@ export const MapGraphic = () => {
   let translation;
   let scale;
   let radius;
+  let tooltipText;
 
   const my = (selection) => {
     let projection = d3.geoMercator().translate(translation).scale(scale);
@@ -25,6 +26,12 @@ export const MapGraphic = () => {
 
     selection.select("g.circle").remove();
 
+    d3.selectAll("body > div.tooltip").remove();
+
+    const tooltip = d3.select("body").append("div")
+     .attr("class", "tooltip")
+     .style("opacity", 0);
+
     selection
       .selectAll("g.container")
       .append("g")
@@ -40,7 +47,21 @@ export const MapGraphic = () => {
         return projection([d.lon, d.lat])[1];
       })
       .attr("r", radius)
-      .style("fill", "red");
+      .style("fill", "red")
+      .on("mouseover", function (event, d) {
+        tooltip.transition()
+          .duration(200)
+          .style("opacity", .9);
+          tooltip.html(d[tooltipText])
+          .style("position", "absolute")
+          .style("left", (event.pageX) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function (d) {
+        tooltip.transition()
+          .duration(500)
+          .style("opacity", 0);
+      });
   };
 
   my.dataMap = function (value) {
@@ -76,6 +97,12 @@ export const MapGraphic = () => {
     radius = value;
     return my;
   };
+
+  my.tooltipText = function (value) {
+    if (!arguments.length) return tooltipText;
+    tooltipText = value;
+    return my;
+  }
 
   return my;
 };
