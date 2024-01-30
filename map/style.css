@@ -3,3 +3,12 @@
   border-radius: 4px;
   color: black;
 }
+
+.menu-container {
+  display: flex;
+  justify-content: space-between;
+}
+.radio-menu {
+  display: flex;
+  gap: 16px;
+}

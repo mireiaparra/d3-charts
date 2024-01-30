@@ -17,12 +17,12 @@ export function generateMap() {
   d3.select(".graphic-container").remove();
 
   const menuContainer = d3
-    .select("body")
+    .select("#chart")
     .append("div")
     .attr("class", "menu-container");
 
-  const radioMenu = menuContainer.append("div");
-  const selectMenu = menuContainer.append("div");
+  const radioMenu = menuContainer.append("div").attr("class", "radio-menu");
+  const selectMenu = menuContainer.append("div").attr("class", "select-menu");
 
   const zoom = d3.zoom().scaleExtent([1, 8]).on("zoom", zoomed);
 
