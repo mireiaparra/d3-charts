@@ -38,6 +38,10 @@ const ScatterPlot = () => {
       y: y(yValue(d)),
     }));
 
+    const colorScale = d3.scaleOrdinal()
+    .domain(d3.range(data.length))
+    .range(d3.schemeCategory10);
+
     const t = d3.transition().duration(1000);
 
     const positionCircles = (circles) => {
@@ -59,6 +63,7 @@ const ScatterPlot = () => {
         (enter) =>
           enter
             .append("circle")
+            .attr('fill', (d, i) => colorScale(i))
             .call(positionCircles)
             .call(initializeRadius)
             .call(growRadius),
@@ -88,7 +93,12 @@ const ScatterPlot = () => {
       .attr("class", "x-axis")
       .attr("transform", `translate(0,${height - margin.bottom})`)
       .transition(t)
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", ".15em")
+      .attr("transform", "rotate(-65)");
   };
 
   my.width = function (param) {

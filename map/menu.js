@@ -10,12 +10,6 @@ export const menuMap = () => {
   const my = (selection) => {
     if (menuType === "select") {
       selection
-        .selectAll("label")
-        .data([null])
-        .join("label")
-        .attr("for", id)
-        .text(labelText);
-      selection
         .selectAll("select")
         .data([null])
         .join("select")
@@ -37,11 +31,6 @@ export const menuMap = () => {
         .attr("id", (d) => `${id}-${d.value}`);
 
       radioDivs
-        .append("label")
-        .attr("for", (d) => d.value)
-        .text((d) => d.value);
-
-      radioDivs
         .append("input")
         .attr("type", "radio")
         .attr("id", (d) => d.value)
@@ -51,6 +40,11 @@ export const menuMap = () => {
         .on("change", (event) => {
           listeners.call("change", null, event.target.value);
         });
+
+        radioDivs
+        .append("label")
+        .attr("for", (d) => d.value)
+        .text((d) => d.value);
     }
   };
   my.id = function (_) {

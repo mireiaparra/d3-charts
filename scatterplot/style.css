@@ -36,10 +36,10 @@ h1 {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo {
@@ -72,14 +72,15 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: box-shadow 0.25s;
 }
 button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  box-shadow: 0 0 .1rem #fff,
+  0 0 .1rem #fff,
+  0 0 .1rem #bc13fe,
+  0 0 .2rem #bc13fe,
+  0 0 .6rem #bc13fe,
+  inset 0 0 .3rem #bc13fe; 
 }
 
 @media (prefers-color-scheme: light) {
@@ -93,4 +94,33 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+
+select {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  background-color: #1a1a1a;
+  box-shadow: 0 0 .1rem #fff,
+  0 0 .1rem #fff,
+  0 0 .1rem #00a2ff,
+  0 0 .2rem #00a2ff,
+  0 0 .6rem #00a2ff,
+  inset 0 0 .3rem #00a2ff; 
+
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.y-axis, .x-axis {
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #ffffff;
+  text-transform: uppercase;
+  font-family: Hack, monospace;
 }

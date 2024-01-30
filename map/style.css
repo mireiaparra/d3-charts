@@ -1,14 +1,204 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+
+
+
+body {
+  font-family: Hack, monospace;
+}
+
 .tooltip {
-  background-color: aquamarine;
+  background-color: #c493ff;
   border-radius: 4px;
   color: black;
+  padding: 5px 10px;
 }
 
 .menu-container {
   display: flex;
   justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  align-items: center;
 }
 .radio-menu {
   display: flex;
   gap: 16px;
+}
+
+nav {
+  margin: 15px;
+  border: 3px solid #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+
+  box-shadow: 0 0 .1rem #fff,
+  0 0 .1rem #fff,
+  0 0 .1rem #bc13fe,
+  0 0 .2rem #bc13fe,
+  0 0 .6rem #bc13fe,
+  inset 0 0 .3rem #bc13fe; 
+
+  .menuItems {
+    display: flex;
+
+    li {
+      margin: 0 15px;
+
+      a {
+        text-decoration: none;
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: 400;
+        transition: all 0.5s ease-in-out;
+        position: relative;
+        text-transform: uppercase;
+
+        &:hover {
+          color:#c493ff;
+        }
+
+        &.active {
+          color:#c493ff;
+          border-bottom: 2px solid #00a2ff;
+        }
+      }
+    }
+  }
+}
+.title {
+  margin: 16px;
+  font-size: 96px;
+  /* color: #ccc; */
+  text-transform: uppercase;
+  font-weight: 600;
+  transition: all 1s ease-in-out;
+  position: relative;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 100vh;
+  font-family: Hack, monospace;
+}
+
+:root {
+  --color-background: #000119;
+  --stroke-width: calc(1em / 16);
+  --font-size: 30vmin;
+  --font-weight: 700;
+  --letter-spacing: calc(1em / 8);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--color-background);
+  /* display: grid;
+  font-family: Poppins, sans-serif;
+  margin: 0;
+  min-block-size: 100vh;
+  place-items: center; */
+}
+
+h1 {
+  background-clip: text;
+  background-image: linear-gradient(to right, #09f1b8, #00a2ff,#c493ff, #ff00d2, #fed90f);
+  color: var(--color-background);
+  font-size: var(--font-size);
+  font-weight: var(--font-weight);
+  letter-spacing: var(--letter-spacing);
+  padding: calc(--stroke-width / 2);
+  -webkit-text-stroke-color: transparent;
+  -webkit-text-stroke-width: var(--stroke-width);
+}
+
+.radio input {
+  display: none;
+}
+.radio > label {
+  display: inline-block;
+  position: relative;
+  margin-right: 16px;
+  padding-left: 24px;
+  cursor: pointer;
+}
+.radio > label:before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 0;
+  top: 50%;
+  margin-top: -8px;
+  border: 1px solid #09f1b8;
+  border-radius: 8px;
+}
+.radio > label:after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 50%;
+  left: 8px;
+  margin-top: 0;
+  background: #00a2ff;
+  border-radius: 4px;
+  transition: 0.2s ease-in-out;
+}
+.radio input[type="radio"]:checked + label::after {
+  height: 8px;
+  width: 8px;
+  margin-top: -3px;
+  left: 5px;
 }

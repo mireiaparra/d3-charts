@@ -26,3 +26,27 @@ if (window.location.hash) {
 } else {
     routes['/']();
 }
+
+// Función para actualizar la clase 'active'
+function updateActiveClass() {
+    // Obtén todos los enlaces del menú
+    const menuItems = document.querySelectorAll('.menuItems a');
+
+    // Recorre todos los enlaces
+    menuItems.forEach((item) => {
+        // Comprueba si el href del enlace coincide con la ruta actual
+        if (item.getAttribute('href') === window.location.hash) {
+            // Si coincide, añade la clase 'active'
+            item.classList.add('active');
+        } else {
+            // Si no coincide, asegúrate de que la clase 'active' no está presente
+            item.classList.remove('active');
+        }
+    });
+}
+
+// Llama a la función cuando se carga la página
+updateActiveClass();
+
+// Llama a la función cuando cambia la URL
+window.addEventListener('hashchange', updateActiveClass);

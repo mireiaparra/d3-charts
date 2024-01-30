@@ -6,10 +6,10 @@ const { csv } = d3;
 
 const csvUrl = "/scatterplot/vgsales.csv";
 
-const width = 800;
-const height = 500;
+const width = 900;
+const height = 600;
 
-const margin = { top: 20, right: 20, bottom: 20, left: 60 };
+const margin = { top: 20, right: 20, bottom: 140, left: 140 };
 
 const xValue = (d) => d.Year;
 const yValue = (d) => d.Global_Sales;
@@ -19,14 +19,16 @@ export function generateScatterPlot() {
 
   d3.select('.menu-container').remove();
   d3.select('.graphic-container').remove();
+  d3.select('.tooltip').remove();
+  d3.select('.reset-button').remove();
 
 const menuContainer = d3
-  .select("body")
+  .select("#app")
   .append("div")
   .attr("class", "menu-container");
 
-const xMenu = menuContainer.append("div");
-const yMenu = menuContainer.append("div");
+const xMenu = menuContainer.append("div").attr("class", "menu");
+const yMenu = menuContainer.append("div").attr("class", "menu");
 
 const parseRow = (d) => {
   d.Rank = +d.Rank;

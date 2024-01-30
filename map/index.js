@@ -5,7 +5,7 @@ import { menuMap } from "./menu.js";
 import { MapGraphic } from "./map.js";
 
 const width = window.innerWidth;
-const height = window.innerHeight * 0.7;
+const height = window.innerHeight * 0.65;
 
 const csvUrl = "/map/trials.csv";
 
@@ -17,7 +17,7 @@ export function generateMap() {
   d3.select(".graphic-container").remove();
 
   const menuContainer = d3
-    .select("#chart")
+    .select("body")
     .append("div")
     .attr("class", "menu-container");
 
@@ -59,7 +59,7 @@ export function generateMap() {
   }
 
   d3.select("button.reset-button").remove();
-  d3.select("#chart")
+  d3.select(".menu-container")
   .append("button")
   .attr("class", "reset-button")
   .text("Reset position")
@@ -126,8 +126,8 @@ export function generateMap() {
     const europe = await json("map/europe.topojson");
 
     const plot = MapGraphic()
-      .translation([400, 1100])
-      .scale(700)
+      .translation([400, 930])
+      .scale(550)
       .dataMap(europe)
       .dataMapDetails(europe.objects.europe)
       .dataMarks(allCoordinates)
