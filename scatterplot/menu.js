@@ -5,6 +5,7 @@ export const menu = () => {
   let labelText;
   let options;
   const listeners = d3.dispatch('change');
+  let defaultOption = 0;
 
   const my = (selection) => {
     selection
@@ -26,7 +27,8 @@ export const menu = () => {
       .data(options)
       .join('option')
       .attr('value', (d) => d.value)
-      .text((d) => d.text);
+      .text((d) => d.text)
+      .property('selected', (d, i) => i === defaultOption); 
   };
 
   my.id = function (_) {
@@ -47,6 +49,10 @@ export const menu = () => {
     let value = listeners.on.apply(listeners, arguments);
     return value === listeners ? my : value;
   };
+
+  my.defaultOption = function (_) {
+    return arguments.length ? ((defaultOption = _), my) : defaultOption;
+  }
 
   return my;
 };

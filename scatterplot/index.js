@@ -9,7 +9,7 @@ const csvUrl = "/scatterplot/vgsales.csv";
 const width = 900;
 const height = 600;
 
-const margin = { top: 20, right: 20, bottom: 140, left: 140 };
+const margin = { top: 50, right: 20, bottom: 140, left: 140 };
 
 const xValue = (d) => d.Year;
 const yValue = (d) => d.Global_Sales;
@@ -21,6 +21,7 @@ export function generateScatterPlot() {
   d3.select('.graphic-container').remove();
   d3.select('.tooltip').remove();
   d3.select('.reset-button').remove();
+  d3.select('.chart-title').remove();
 
 const menuContainer = d3
   .select("#app")
@@ -37,6 +38,11 @@ const parseRow = (d) => {
   d.Global_Sales = +d.Global_Sales;
   return d;
 };
+
+  d3.select("#chart")
+    .append("h2")
+    .attr("class", "chart-title")
+    .text("Nintendo Games Sales");
 
 const svg = d3
   .select("#chart")
@@ -96,6 +102,7 @@ const main = async () => {
           .yValue((d) => d[column])
           .yType(getType(column)));
       })
+      .defaultOption(1)
   );
 };
 

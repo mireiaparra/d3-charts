@@ -15,6 +15,7 @@ let updateFunction = () => {};
 export function generateMap() {
   d3.select(".menu-container").remove();
   d3.select(".graphic-container").remove();
+  d3.select(".chart-title").remove();
 
   const menuContainer = d3
     .select("body")
@@ -25,6 +26,11 @@ export function generateMap() {
   const selectMenu = menuContainer.append("div").attr("class", "select-menu");
 
   const zoom = d3.zoom().scaleExtent([1, 8]).on("zoom", zoomed);
+  
+  d3.select("#chart")
+  .append("h2")
+  .attr("class", "chart-title")
+  .text("Trials for Witchcraft in Europe (1400-1900)");
 
   const svg = d3
     .select("#chart")
@@ -126,8 +132,8 @@ export function generateMap() {
     const europe = await json("map/europe.topojson");
 
     const plot = MapGraphic()
-      .translation([400, 930])
-      .scale(550)
+      .translation([window.innerWidth / 2 - 150, 960])
+      .scale(530)
       .dataMap(europe)
       .dataMapDetails(europe.objects.europe)
       .dataMarks(allCoordinates)

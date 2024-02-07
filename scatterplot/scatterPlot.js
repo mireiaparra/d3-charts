@@ -43,6 +43,7 @@ const ScatterPlot = () => {
     .range(d3.schemeCategory10);
 
     const t = d3.transition().duration(1000);
+    const tCircles = d3.transition().duration(2000);
 
     const positionCircles = (circles) => {
       circles.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
@@ -53,7 +54,7 @@ const ScatterPlot = () => {
     };
 
     const growRadius = (enter) => {
-      enter.transition(t).attr("r", radius);
+      enter.transition(tCircles).attr("r", radius);
     };
 
     selection

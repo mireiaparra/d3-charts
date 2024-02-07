@@ -19,9 +19,10 @@ export const MapGraphic = () => {
 
     const path = d3.geoPath().projection(projection);
 
-const colorScale = d3.scaleLog()
-  .domain([1, d3.max(dataMarks, d => d[propertyColor])]) 
-  .interpolate(() => d3.interpolateRdPu);
+    const colorScale = d3
+      .scaleLog()
+      .domain([1, d3.max(dataMarks, (d) => d[propertyColor])])
+      .interpolate(() => d3.interpolateRdPu);
 
     selection.select("path").remove();
 
@@ -33,13 +34,14 @@ const colorScale = d3.scaleLog()
       .attr("stroke", "#ccc")
       .attr("d", path);
 
-      
-      d3.select("body > div.tooltip").remove();
-      
-      const tooltip = d3.select("body").append("div")
+    d3.select("body > div.tooltip").remove();
+
+    const tooltip = d3
+      .select("body")
+      .append("div")
       .attr("class", "tooltip")
       .style("opacity", 0);
-      
+
     selection.select("g.circle").remove();
     selection
       .selectAll("g.container")
@@ -56,21 +58,27 @@ const colorScale = d3.scaleLog()
         return projection([d.lon, d.lat])[1];
       })
       .attr("r", radius)
-      .style("fill", d => colorScale(d[propertyColor]))
+      .style("fill", (d) => colorScale(d[propertyColor]))
+      .attr("opacity", 0)
       .on("mouseover", function (event, d) {
-        tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-          tooltip.html(tooltipTexts.map(key => `${capitalizeFirstLetter(key)}: ${d[key]}`).join("\n"))
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(
+            tooltipTexts
+              .map((key) => `${capitalizeFirstLetter(key)}: ${d[key]}`)
+              .join("\n")
+          )
           .style("position", "absolute")
-          .style("left", (event.pageX) + "px")
-          .style("top", (event.pageY - 28) + "px");
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY - 28 + "px");
       })
       .on("mouseout", function (d) {
-        tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-      });
+        tooltip.transition().duration(500).style("opacity", 0);
+      })
+      .transition()
+      .delay((d, i) => i * 30) 
+      .duration(1000)
+      .attr("opacity", 1)
   };
 
   my.dataMap = function (value) {
@@ -111,13 +119,13 @@ const colorScale = d3.scaleLog()
     if (!arguments.length) return tooltipTexts;
     tooltipTexts = value;
     return my;
-  }
+  };
 
   my.propertyColor = function (value) {
     if (!arguments.length) return propertyColor;
     propertyColor = value;
     return my;
-  }
+  };
 
   return my;
 };
