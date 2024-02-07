@@ -61,7 +61,7 @@ export const MapGraphic = () => {
       .style("fill", (d) => colorScale(d[propertyColor]))
       .attr("opacity", 0)
       .on("mouseover", function (event, d) {
-        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip.transition().duration(100).style("opacity", 0.9);
         tooltip
           .html(
             tooltipTexts

@@ -28,8 +28,8 @@ const menuContainer = d3
   .append("div")
   .attr("class", "menu-container");
 
-const xMenu = menuContainer.append("div").attr("class", "menu");
 const yMenu = menuContainer.append("div").attr("class", "menu");
+const xMenu = menuContainer.append("div").attr("class", "menu");
 
 const parseRow = (d) => {
   d.Rank = +d.Rank;
@@ -62,6 +62,7 @@ const main = async () => {
     .xValue(xValue)
     .yValue(yValue)
     .margin(margin)
+    .tooltipTexts(['Name'])
     .radius(5);
 
   svg.call(plot);

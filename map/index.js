@@ -132,7 +132,7 @@ export function generateMap() {
     const europe = await json("map/europe.topojson");
 
     const plot = MapGraphic()
-      .translation([window.innerWidth / 2 - 150, 960])
+      .translation([window.innerWidth / 2 + 40, 960])
       .scale(530)
       .dataMap(europe)
       .dataMapDetails(europe.objects.europe)
