@@ -4,7 +4,7 @@ import { ScatterPlot } from "./scatterPlot.js";
 import { menu } from "./menu.js";
 const { csv } = d3;
 
-const csvUrl = "/scatterplot/vgsales.csv";
+const csvUrl = "/vgsales.csv";
 
 const width = 900;
 const height = 600;
