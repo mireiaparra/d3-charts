@@ -20,21 +20,22 @@
   width: 16px;
   height: 16px;
   left: 0;
-  top: 50%;
+  top: 40%;
   margin-top: -8px;
-  border: 1px solid #09f1b8;
+  border: 1px solid var(--color-radio);
   border-radius: 8px;
 }
+
 .radio > label:after {
   content: "";
   display: block;
   position: absolute;
   width: 0;
   height: 0;
-  top: 50%;
+  top: 40%;
   left: 8px;
   margin-top: 0;
-  background: #00a2ff;
+  background: var(--color-radio);
   border-radius: 4px;
   transition: 0.2s ease-in-out;
 }

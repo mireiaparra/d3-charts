@@ -11,6 +11,7 @@ const ScatterPlot = () => {
   let margin;
   let radius;
   let tooltipTexts;
+  let colorScheme;
 
   function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -38,14 +39,11 @@ const ScatterPlot = () => {
             .domain(d3.extent(data, yValue))
             .range([height - margin.bottom, margin.top]);
 
-    // const marks = data.map((d) => ({
-    //   x: x(xValue(d)),
-    //   y: y(yValue(d)),
-    // }));
 
-    const colorScale = d3.scaleOrdinal()
-    .domain(d3.range(data.length))
-    .range(d3.schemeCategory10);
+    const colorScale = d3
+      .scaleOrdinal()
+      .domain(d3.range(data.length))
+      .range(colorScheme);
 
     const t = d3.transition().duration(1000);
     const tCircles = d3.transition().duration(2000);
@@ -76,50 +74,34 @@ const ScatterPlot = () => {
         (enter) =>
           enter
             .append("circle")
-            .attr('fill', (d, i) => colorScale(i))
+            .attr("fill", (d, i) => colorScale(i))
             .call(positionCircles)
             .call(initializeRadius)
-            .call(growRadius)
-            .on("mouseover", function (event, d) {
-              tooltip.transition().duration(100).style("opacity", 0.9);
-              tooltip
-                .html(
-                  tooltipTexts
-                    .map((key) => `${capitalizeFirstLetter(key)}: ${d[key]}`)
-                    .join("\n")
-                )
-                .style("position", "absolute")
-                .style("left", event.pageX + "px")
-                .style("top", event.pageY - 28 + "px");
-            })
-            .on("mouseout", function (d) {
-              tooltip.transition().duration(500).style("opacity", 0);
-            }),
+            .call(growRadius),
         (update) =>
           update.call((update) =>
             update
               .transition(t)
               .delay((d, i) => i * 1)
               .call(positionCircles)
-              .on("mouseover", function (event, d) {
-                console.log(d);
-                tooltip.transition().duration(100).style("opacity", 0.9);
-                tooltip
-                  .html(
-                    tooltipTexts
-                      .map((key) => `${capitalizeFirstLetter(key)}: ${d[key]}`)
-                      .join("\n")
-                  )
-                  .style("position", "absolute")
-                  .style("left", event.pageX + "px")
-                  .style("top", event.pageY - 28 + "px");
-              })
-              .on("mouseout", function (d) {
-                tooltip.transition().duration(500).style("opacity", 0);
-              }),
           ),
         (exit) => exit.remove()
-      );
+      )
+      .on("mouseover", function (event, d) {
+        tooltip.transition().duration(100).style("opacity", 0.9);
+        tooltip
+          .html(
+            tooltipTexts
+              .map((key) => `${capitalizeFirstLetter(key)}: ${d[key]}`)
+              .join("\n")
+          )
+          .style("position", "absolute")
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY - 28 + "px");
+      })
+      .on("mouseout", function (d) {
+        tooltip.transition().duration(500).style("opacity", 0);
+      });
 
     selection
       .selectAll(".y-axis")
@@ -184,6 +166,10 @@ const ScatterPlot = () => {
   my.tooltipTexts = function (param) {
     return arguments.length ? ((tooltipTexts = param), my) : tooltipTexts;
   };
+
+  my.colorScheme = function (param) {
+    return arguments.length ? ((colorScheme = param), my) : colorScheme;
+  }
 
   return my;
 };

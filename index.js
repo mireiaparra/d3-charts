@@ -50,3 +50,21 @@ updateActiveClass();
 
 // Llama a la función cuando cambia la URL
 window.addEventListener('hashchange', updateActiveClass);
+
+const themeCheckbox = document.querySelector('.switch__input');
+themeCheckbox.checked = true;
+
+
+themeCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.remove('light-mode');
+      } else {
+        document.body.classList.add('light-mode');
+      }
+
+      const event = new CustomEvent('themeChange', {
+        detail: { lightMode: document.body.classList.contains('light-mode') }
+      });
+    
+      window.dispatchEvent(event);
+});

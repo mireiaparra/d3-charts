@@ -51,7 +51,16 @@ const svg = d3
   .attr("height", height)
   .attr("class", "graphic-container");
 
+  let colorScheme;
+  let isLightMode = document.body.classList.contains('light-mode');
+  if (isLightMode) {
+    colorScheme = d3.schemePastel1;
+  } else {
+    colorScheme = d3.schemeCategory10;
+  }
+
 const main = async () => {
+
   let data = await csv(csvUrl, parseRow);
   data = data.filter((d) => d.Publisher === "Nintendo" && Number(d.Year));
 
@@ -63,7 +72,8 @@ const main = async () => {
     .yValue(yValue)
     .margin(margin)
     .tooltipTexts(['Name'])
-    .radius(5);
+    .radius(5)
+    .colorScheme(colorScheme);
 
   svg.call(plot);
 
@@ -105,6 +115,39 @@ const main = async () => {
       })
       .defaultOption(1)
   );
+
+  window.addEventListener('themeChange', function(event) {
+    if (event.detail.lightMode) {
+      colorScheme = d3.schemePastel1;
+    } else {
+      colorScheme = d3.schemeCategory10;
+    }
+    updateChart();
+  });
+  
+  function updateChart() {
+    const plot = ScatterPlot()
+    .width(width)
+    .height(height)
+    .data(data)
+    .xValue(xValue)
+    .yValue(yValue)
+    .margin(margin)
+    .tooltipTexts(['Name'])
+    .radius(5)
+    .colorScheme(colorScheme);
+  
+    svg.selectAll('*').remove();
+
+  // Dibuja la gráfica actualizada
+  svg.call(plot);
+
+  // Actualiza los estilos de la gráfica
+  svg.selectAll('circle')
+    .style('fill', function(d, i) {
+      return colorScheme[i % colorScheme.length];
+    });
+  }
 };
 
 main();
