@@ -3,8 +3,10 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import { ScatterPlot } from "./scatterPlot.js";
 import { menu } from "./menu.js";
 const { csv } = d3;
+import config from "../vite.config.js";
 
-const csvUrl = "/vgsales.csv";
+
+const csvUrl = `${config.base}/vgsales.csv`;
 
 const width = 900;
 const height = 600;

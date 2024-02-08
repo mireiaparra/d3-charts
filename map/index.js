@@ -3,11 +3,12 @@ import "./style.css";
 const { csv, json } = d3;
 import { menuMap } from "./menu.js";
 import { MapGraphic } from "./map.js";
+import config from "../vite.config.js";
 
 const width = window.innerWidth;
 const height = window.innerHeight * 0.65;
 
-const csvUrl = "/trials.csv";
+const csvUrl = `${config.base}/trials.csv`;
 
 let currentZoom = 1;
 let updateFunction = () => {};
@@ -129,7 +130,7 @@ export function generateMap() {
 
     let allCoordinates = dataCenturies[defaultCentury].details
     .filter((d) => !isNaN(Number(d[defaultType])) && d[defaultType] !== 0)
-    const europe = await json("/europe.topojson");
+    const europe = await json(`${config.base}/europe.topojson`);
 
     const plot = MapGraphic()
       .translation([window.innerWidth / 2 - 100, 960])
